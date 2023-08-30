@@ -81,12 +81,15 @@ impl KeyedAttributeValue {
 /// Example:
 /// key=value // attribute with ident as value
 /// key // attribute without value
+/// ..key // attribute with .. prefix
 #[derive(Clone, Debug, syn_derive::ToTokens)]
 pub struct KeyedAttribute {
     /// Key of the element attribute.
     pub key: NodeName,
     /// Value of the element attribute.
     pub possible_value: KeyedAttributeValue,
+    /// Has .. prefix
+    pub dot_dot: Option<Token![..]>,
 }
 impl KeyedAttribute {
     ///
@@ -204,6 +207,7 @@ pub enum NodeAttribute {
     /// Example:
     /// - `<div attr>`
     /// - `<div attr = value>`
+    /// - `<div ..attr>`
     ///
     /// Value can be also in parens after key, but then it is parsed as closure
     /// arguments. Example:
@@ -215,6 +219,7 @@ pub enum NodeAttribute {
 // Use custom parse to correct error.
 impl Parse for KeyedAttribute {
     fn parse(input: ParseStream) -> syn::Result<Self> {
+        let dot_dot = input.parse::<Option<Token![..]>>()?;
         let key = NodeName::parse(input)?;
         let possible_value = if input.peek(Paren) {
             KeyedAttributeValue::Binding(FnBinding::parse(input)?)
@@ -246,6 +251,7 @@ impl Parse for KeyedAttribute {
         Ok(KeyedAttribute {
             key,
             possible_value,
+            dot_dot,
         })
     }
 }

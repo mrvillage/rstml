@@ -290,7 +290,8 @@ impl Parse for NodeName {
                     },
                 })
             })
-        } else if input.peek2(Colon) || input.peek2(Dash) || input.peek2(Dot) {
+        } else if input.peek2(Colon) || input.peek2(Dash) || (input.peek2(Dot) && !input.peek3(Dot))
+        {
             NodeName::node_name_punctuated_ident_with_two_alternate::<
                 Punct,
                 fn(_) -> Colon,

@@ -875,6 +875,18 @@ fn test_single_element_with_different_attributes() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn test_dot_dot() -> Result<()> {
+    let tokens = quote! {
+        <foo baz ..bar></foo>
+    };
+    let nodes = parse2(tokens)?;
+    // panic!("{:?}", nodes);
+    assert!(get_element_attribute(&nodes, 0, 1).dot_dot.is_some());
+    assert!(get_element_attribute(&nodes, 0, 0).dot_dot.is_none());
+    Ok(())
+}
+
 fn get_element(nodes: &[Node], element_index: usize) -> &NodeElement {
     let Some(Node::Element(element)) = nodes.get(element_index) else {
         panic!("expected element")
